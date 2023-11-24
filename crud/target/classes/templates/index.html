@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Libros</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+		integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+		crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="">App Libro</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+
+					<li class="nav-item">
+						<a class="nav-link" href="/">Inicio</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+
+		<h2>Libros</h2>
+
+		<!-- Formulario crear -->
+
+		<form id="form-crear">
+
+			<div class="form-group">
+				<label>Título:</label>
+				<input type="text" class="form-control" id="titulo">
+			</div>
+
+			<div class="form-group">
+				<label>Código:</label>
+				<input type="text" class="form-control" id="codigo">
+			</div>
+
+			<div class="form-group">
+				<label>Número de páginas:</label>
+				<input type="number" class="form-control" id="nPaginas">
+			</div>
+
+			<div class="form-group">
+				<label>Precio:</label>
+				<input type="number" step=".01" class="form-control" id="precio">
+			</div>
+
+			<div class="form-group">
+				<label>Stock:</label>
+				<input type="number" class="form-control" id="stock">
+			</div>
+
+
+
+			<div class="form-group">
+				<label>Categoría:</label>
+				<input type="text" class="form-control" id="categoria">
+			</div>
+
+			<div class="form-group">
+				<label>Editorial:</label>
+				<input type="text" class="form-control" id="editorial">
+			</div>
+
+			<div class="form-group">
+				<label>Autor:</label>
+				<input type="text" class="form-control" id="autor">
+			</div>
+
+			<button type="submit" class="btn btn-primary" id="btn-crear">Crear</button>
+
+		</form>
+
+		<hr>
+
+		<!-- Tabla -->
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Título</th>
+					<th>Código</th>
+					<th>Número de Páginas</th>
+					<th>Precio</th>
+					<th>Stock</th>
+
+					<th>Categoría</th>
+					<th>Editorial</th>
+					<th>Autor</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody id="libros-body">
+				<!-- Aquí se generará dinámicamente el contenido de la tabla -->
+			</tbody>
+		</table>
+
+		<hr>
+
+		<!-- Formulario actualizar -->
+
+		
+
+	</div>
+	
+	<div class="modal fade" id="editarLibroModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Editar Libro</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulario para editar el libro -->
+        <form id="form-editar-libro">
+          <input type="hidden" id="id-actualizar-modal">
+          <div class="form-group">
+            <label>Título:</label>
+            <input type="text" class="form-control" id="titulo-actualizar-modal">
+          </div>
+          <!-- Agrega los demás campos de edición aquí -->
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="btn-actualizar-libro">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+	<script>
+
+		// Funciones AJAX CRUD
+
+		function listarLibros() {
+			$.get("/api/libros/listar", function (data) {
+				var rows = [];
+				data.forEach(function (libro) {
+					rows.push(`
+                <tr>
+                    <td>${libro.idLibros}</td>
+                    <td>${libro.titulo}</td>
+                    <td>${libro.codigo}</td>
+                    <td>${libro.nPaginas}</td> 
+                    <td>${libro.precio}</td>
+                    <td>${libro.stock}</td>
+            
+                    <td>${libro.categoria}</td>
+                    <td>${libro.editorial}</td>
+                    <td>${libro.autor}</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" onclick="cargarFormActualizar(${libro.idLibros})">Editar</a>
+                        <a class="btn btn-danger btn-sm" onclick="eliminarLibro(${libro.idLibros})">Eliminar</a>
+                    </td>
+                </tr>
+            `);
+				});
+				$("#libros-body").html(rows);
+			});
+		}
+		  function crearLibro() {
+            var titulo = $("#titulo").val();
+            var codigo = $("#codigo").val();
+            var nPaginas = $("#nPaginas").val();
+            var precio = $("#precio").val();
+            var stock = $("#stock").val();
+            var categoria = $("#categoria").val();
+            var editorial = $("#editorial").val();
+            var autor = $("#autor").val();
+            var data = {
+                titulo: titulo,
+                codigo: codigo,
+                nPaginas: nPaginas,
+                precio: precio,
+                stock: stock,
+                categoria: categoria,
+                editorial: editorial,
+                autor: autor
+            };
+            console.log("Datos a enviar:", data);
+            $.ajax({
+                url: "/api/libros/crear",
+                type: "POST",
+                data: JSON.stringify(data), // Convertir los datos a JSON
+                contentType: "application/json", // Establecer el tipo de contenido a JSON
+            })
+            .done(function (response) {
+                console.log("Respuesta recibida:", response);
+                listarLibros();
+            });
+        }
+        // Captura el evento de envío del formulario
+        $(document).ready(function () {
+            $("#form-crear").submit(function (event) {
+                event.preventDefault(); // Evita el envío predeterminado del formulario
+                crearLibro(); // Llama a la función crearLibro
+            });
+        });
+
+
+  function cargarFormActualizarModal(id) {
+    // Aquí debes cargar los datos del libro con el ID proporcionado
+    // y llenar los campos del formulario en el modal con esos datos
+  }
+
+ function editarLibro(id) {
+    cargarFormActualizarModal(id);
+    $('#editarLibroModal').modal('show'); // Abre el modal
+  }
+
+		function eliminarLibro(id) {
+
+			$.ajax({
+				url: "/api/libros/eliminar/" + id,
+				type: "DELETE"
+			}).done(function () {
+				listarLibros();
+			});
+
+		}
+
+		// Invocar al cargar
+		listarLibros();
+
+	</script>
+</body>
+
+</html>
